@@ -1,0 +1,7 @@
+description = " OANDA APIv20 bindings"
+version = "%%VERSION%%"
+requires = "ocplib-json-typed ptime"
+archive(byte) = "oanda.cma"
+archive(native) = "oanda.cmxa"
+plugin(byte) = "oanda.cma"
+plugin(native) = "oanda.cmxs"
