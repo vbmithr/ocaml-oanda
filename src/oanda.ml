@@ -17,33 +17,53 @@ let ptime_encoding =
 let decimal_encoding =
   Json_encoding.(conv string_of_float float_of_string string)
 
-module AccountID = struct
-  type t = {
-    site : int ;
-    division : int ;
-    user : int ;
-    account : int ;
-  }
+module Account = struct
+  module Id = struct
+    type t = {
+      site : int ;
+      division : int ;
+      user : int ;
+      account : int ;
+    }
 
-  let of_string s =
-    let vs = String.split_on_char '-' s in
-    match ListLabels.map vs ~f:int_of_string with
-    | exception _ -> None
-    | [ site ; division ; user ; account ] ->
-        Some { site ; division ; user ; account }
-    | _ -> None
+    let of_string s =
+      let vs = String.split_on_char '-' s in
+      match ListLabels.map vs ~f:int_of_string with
+      | exception _ -> None
+      | [ site ; division ; user ; account ] ->
+          Some { site ; division ; user ; account }
+      | _ -> None
 
-  let to_string { site ; division ; user ; account } =
-    Printf.sprintf "%d-%d-%d-%d" site division user account
+    let to_string { site ; division ; user ; account } =
+      Printf.sprintf "%d-%d-%d-%d" site division user account
 
-  let encoding =
-    let open Json_encoding in
-    conv
-      to_string
-      (fun s -> match of_string s with
-      | Some a -> a
-      | None -> invalid_arg "AccountID.encoding")
-      string
+    let encoding =
+      let open Json_encoding in
+      conv
+        to_string
+        (fun s -> match of_string s with
+          | Some a -> a
+          | None -> invalid_arg "AccountID.encoding")
+        string
+  end
+
+  module Properties = struct
+    type t = {
+      id : Id.t ;
+      mt4AccountID : int ;
+      tags : string list ;
+    }
+
+    let encoding =
+      let open Json_encoding in
+      conv
+        (fun { id ; mt4AccountID ; tags } -> (id, mt4AccountID, tags))
+        (fun (id, mt4AccountID, tags) -> { id ; mt4AccountID ; tags })
+        (obj3
+           (req "id" Id.encoding)
+           (dft "mt4AccountID" int 0)
+           (dft "tags" (list string) []))
+  end
 end
 
 module Instrument = struct

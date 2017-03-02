@@ -10,17 +10,29 @@
 
 (** {1 Oanda} *)
 
-module AccountID : sig
-  type t = {
-    site : int ;
-    division : int ;
-    user : int ;
-    account : int ;
-  }
+module Account : sig
+  module Id : sig
+    type t = {
+      site : int ;
+      division : int ;
+      user : int ;
+      account : int ;
+    }
 
-  val of_string : string -> t option
-  val to_string : t -> string
-  val encoding : t Json_encoding.encoding
+    val of_string : string -> t option
+    val to_string : t -> string
+    val encoding : t Json_encoding.encoding
+  end
+
+  module Properties : sig
+    type t = {
+      id : Id.t ;
+      mt4AccountID : int ;
+      tags : string list ;
+    }
+
+    val encoding : t Json_encoding.encoding
+  end
 end
 
 module Price : sig
