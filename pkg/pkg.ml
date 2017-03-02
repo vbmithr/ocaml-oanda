@@ -10,6 +10,6 @@ let () =
   let async = Conf.value c async in
   let cohttp = Conf.value c cohttp in
   Ok [ Pkg.mllib "src/oanda.mllib" ;
-       Pkg.mllib ~cond:(async && cohttp) "src/telegram_async.mllib" ;
+       Pkg.mllib ~cond:(async && cohttp) "src/oanda_async.mllib" ;
        Pkg.bin ~cond:false ~auto:true "src/oanda_shell" ;
      ]

@@ -15,7 +15,10 @@ depends: [
   "ocplib-json-typed"
   "ptime"
 ]
-depopts: []
+depopts: [
+  "cohttp"
+  "async_ssl"
+]
 build:
 [[ "ocaml" "pkg/pkg.ml" "build"
            "--pinned" "%{pinned}%" ]]
