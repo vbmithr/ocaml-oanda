@@ -35,7 +35,7 @@ module Account = struct
       | _ -> None
 
     let to_string { site ; division ; user ; account } =
-      Printf.sprintf "%d-%d-%d-%d" site division user account
+      Printf.sprintf "%03d-%03d-%d-%03d" site division user account
 
     let encoding =
       let open Json_encoding in
@@ -71,6 +71,8 @@ module Instrument = struct
     base : string ;
     quote : string ;
   }
+
+  let create_name ~base ~quote = { base ; quote }
 
   let name_of_string s =
     match String.split_on_char '_' s with
@@ -216,38 +218,37 @@ module Price = struct
     base : string ;
     quote : string ;
     timestamp : Ptime.t ;
-    status : status ;
+    tradeable : bool ;
     bids : bucket list ;
     asks : bucket list ;
     closeoutBid : float ;
     closeoutAsk : float ;
-    quote_home : quote_home ;
-    available : available ;
   }
 
   let encoding =
     let open Json_encoding in
     conv
-      (fun { base ; quote ; timestamp ; status ;
-             bids ; asks ; closeoutBid ; closeoutAsk ; quote_home ; available } ->
-        ("PRICE", { Instrument.base ; quote }, timestamp, status, bids,
-         asks, closeoutBid, closeoutAsk, quote_home, available))
-      (fun (_, { base ; quote }, timestamp, status, bids,
-            asks, closeoutBid, closeoutAsk, quote_home, available) ->
-        { base ; quote ; timestamp ; status ;
-          bids ; asks ; closeoutBid ; closeoutAsk ; quote_home ;
-          available })
-      (obj10
-         (req "type" string)
-         (req "instrument" Instrument.name_encoding)
-         (req "time" ptime_encoding)
-         (req "status" status_encoding)
-         (req "bids" (list bucket_encoding))
-         (req "asks" (list bucket_encoding))
-         (req "closeoutBid" decimal_encoding)
-         (req "closeoutAsk" decimal_encoding)
-         (req "quoteHomeConversionFactors" quote_home_encoding)
-         (req "unitsAvailable" available_encoding))
+      (fun { base ; quote ; timestamp ; tradeable ;
+             bids ; asks ; closeoutBid ; closeoutAsk } ->
+        (("PRICE", { Instrument.base ; quote }, timestamp, tradeable, bids,
+         asks, closeoutBid, closeoutAsk), (None, None, None)))
+      (fun ((_, { base ; quote }, timestamp, tradeable, bids,
+            asks, closeoutBid, closeoutAsk), (_status, _quote_home, _available)) ->
+        { base ; quote ; timestamp ; tradeable ; bids ; asks ; closeoutBid ; closeoutAsk })
+      (merge_objs
+         (obj8
+            (req "type" string)
+            (req "instrument" Instrument.name_encoding)
+            (req "time" ptime_encoding)
+            (req "tradeable" bool)
+            (req "bids" (list bucket_encoding))
+            (req "asks" (list bucket_encoding))
+            (req "closeoutBid" decimal_encoding)
+            (req "closeoutAsk" decimal_encoding))
+         (obj3
+            (opt "status" any_value)
+            (opt "quoteHomeConversionFactors" any_value)
+            (opt "unitsAvailable" any_value)))
 end
 
 (*---------------------------------------------------------------------------

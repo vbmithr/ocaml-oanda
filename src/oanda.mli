@@ -35,42 +35,33 @@ module Account : sig
   end
 end
 
-module Price : sig
-  type status = Tradeable | Non_tradeable | Invalid
+module Instrument : sig
+  type name = {
+    base : string ;
+    quote : string ;
+  }
 
+  val create_name : base:string -> quote:string -> name
+  val name_of_string : string -> name option
+  val name_to_string : name -> string
+  val name_encoding : name Json_encoding.encoding
+end
+
+module Price : sig
   type bucket = {
     price : float ;
     liquidity : int ;
-  }
-
-  type quote_home = {
-    positive : float ;
-    negative : float ;
-  }
-
-  type available_detail = {
-    default : float ;
-    reduceFirst : float ;
-    reduceOnly : float ;
-    openOnly : float ;
-  }
-
-  type available = {
-    long : available_detail ;
-    short : available_detail ;
   }
 
   type t = {
     base : string ;
     quote : string ;
     timestamp : Ptime.t ;
-    status : status ;
+    tradeable : bool ;
     bids : bucket list ;
     asks : bucket list ;
     closeoutBid : float ;
     closeoutAsk : float ;
-    quote_home : quote_home ;
-    available : available ;
   }
 
   val encoding : t Json_encoding.encoding
