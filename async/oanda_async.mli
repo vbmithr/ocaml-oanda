@@ -1,5 +1,5 @@
-open Core.Std
-open Async.Std
+open Core
+open Async
 open Oanda
 
 val init : user_agent:string -> token:string -> unit

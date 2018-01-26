@@ -1,0 +1,15 @@
+(jbuild_version 1)
+
+(library
+ ((name        oanda_async)
+  (public_name oanda-async)
+  (synopsis "Bindings to OANDA v20 API/ Async")
+  (modules (oanda_async))
+  (libraries (oanda cohttp-async yojson))))
+
+(executables
+ ((names        (oanda_shell))
+  (public_names (oanda-shell))
+  (libraries (oanda-async))
+  (modules oanda_shell)
+  (package oanda-async)))

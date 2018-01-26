@@ -1,0 +1,12 @@
+(jbuild_version 1)
+
+(library
+ ((name        oanda)
+  (public_name oanda)
+  (synopsis "Bindings to OANDA v20 API")
+  (libraries (ocplib-json-typed ptime))))
+
+;; (executables
+;;  ((names        ())
+;;   (public_names ())
+;;   (libraries ())))

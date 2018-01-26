@@ -1,5 +1,5 @@
-open Core.Std
-open Async.Std
+open Core
+open Async
 open Log.Global
 
 open Oanda
@@ -52,7 +52,7 @@ let command =
     +> anon ("cmd" %: string)
     +> anon (sequence ("cmd_args" %: string))
   in
-  Command.async ~summary:"OANDA Shell" spec main
+  Command.async_spec ~summary:"OANDA Shell" spec main
 
 let () = Command.run command
 
